@@ -19,7 +19,6 @@ public final class SwapView: UIView {
         super.init(frame: frame)
         backgroundColor = .blue
         imageView.image = UIImage(systemName: "arrow.swap")?.withTintColor(.white, renderingMode: .alwaysOriginal)
-
         addGestureRecognizer(tapGesture)
 
         addSubviews()

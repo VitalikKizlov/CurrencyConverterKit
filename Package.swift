@@ -27,6 +27,7 @@ let package = Package(
                 "Injection",
                 "Networking",
                 "Models",
+                "Services",
                 .product(name: "CombineCocoa", package: "CombineCocoa"),
             ]),
         .testTarget(
@@ -36,5 +37,6 @@ let package = Package(
         .target(name: "Injection", dependencies: ["Networking"]),
         .target(name: "Networking", dependencies: ["Utilities", "Models"]),
         .target(name: "Models", dependencies: []),
+        .target(name: "Services", dependencies: ["Networking", "Injection"])
     ]
 )

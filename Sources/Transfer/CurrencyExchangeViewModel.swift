@@ -21,7 +21,7 @@ public final class CurrencyExchangeViewModel {
 
     // MARK: - Input
 
-    public let viewInput = PassthroughSubject<TransferView.ViewAction, Never>()
+    public let viewInput = PassthroughSubject<CurrencyConverterView.ViewAction, Never>()
     private lazy var viewInputPublisher = viewInput.eraseToAnyPublisher()
 
     // MARK: - Properties
@@ -40,7 +40,7 @@ public final class CurrencyExchangeViewModel {
             .store(in: &subscriptions)
     }
 
-    private func proceedViewAction(_ action: TransferView.ViewAction) {
+    private func proceedViewAction(_ action: CurrencyConverterView.ViewAction) {
         switch action {
         case .swapViewTapped:
             guard case .loaded(var exchangeData) = state else { return }

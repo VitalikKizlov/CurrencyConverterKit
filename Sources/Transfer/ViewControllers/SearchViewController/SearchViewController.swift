@@ -57,7 +57,7 @@ public final class SearchViewController: UIViewController {
 
     public override func viewDidLoad() {
         super.viewDidLoad()
-        title = "Search Items"
+        title = "Send"
         setUpBindings()
         configureUI()
     }

@@ -10,7 +10,7 @@ import Utilities
 import Combine
 import CombineCocoa
 
-public final class TransferView: UIView {
+public final class CurrencyConverterView: UIView {
 
     @AutoLayoutable private var stackView = UIStackView()
     @AutoLayoutable private var senderExchangeDataView = ExchangeDataView()
@@ -95,6 +95,22 @@ public final class TransferView: UIView {
                 self.viewAction.send(.receiverAmountValueChanged(text))
             }
             .store(in: &subscriptions)
+
+        senderExchangeDataView.countryView.tapGesture
+            .tapPublisher
+            .sink { [weak self] _ in
+                guard let self = self else { return }
+                self.viewAction.send(.sendingFromViewTapped)
+            }
+            .store(in: &subscriptions)
+
+        receiverExchangeDataView.countryView.tapGesture
+            .tapPublisher
+            .sink { [weak self] _ in
+                guard let self = self else { return }
+                self.viewAction.send(.receiveViewTapped)
+            }
+            .store(in: &subscriptions)
     }
 
     // MARK: - Public
@@ -115,7 +131,7 @@ public struct TransferViewViewModel {
     }
 }
 
-extension TransferView {
+extension CurrencyConverterView {
     public enum ViewAction {
         case swapViewTapped
         case sendingFromViewTapped

@@ -13,12 +13,15 @@ public final class CountryView: UIView {
     @AutoLayoutable private var imageView = UIImageView()
     @AutoLayoutable private var titleLabel = UILabel()
 
+    let tapGesture = UITapGestureRecognizer()
+
     // MARK: - Init
 
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupSubviews()
         addSubviews()
+        addGestureRecognizer(tapGesture)
     }
 
     @available(*, unavailable)

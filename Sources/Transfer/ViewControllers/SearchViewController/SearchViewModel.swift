@@ -12,7 +12,7 @@ public final class SearchViewModel {
 
     // MARK: - Dependencies
 
-
+    
 
     // MARK: - Input
 
@@ -27,7 +27,7 @@ public final class SearchViewModel {
 
     // MARK: - Lifecycle
 
-    init() {
+    public init() {
         setupBindings()
     }
 

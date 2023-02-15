@@ -11,7 +11,7 @@ import Utilities
 public final class ExchangeDataView: UIView {
 
     @AutoLayoutable private var titleLabel = UILabel()
-    @AutoLayoutable private var countryView = CountryView()
+    @AutoLayoutable private(set) var countryView = CountryView()
     @AutoLayoutable private(set) var textfield = UITextField()
 
     // MARK: - Init
