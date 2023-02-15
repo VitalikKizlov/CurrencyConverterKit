@@ -8,8 +8,8 @@
 import Foundation
 
 public struct ExchangeRateData: Codable {
-    public let from: String
-    public let to: String
+    public let from: Currency
+    public let to: Currency
     public let rate: Double
     public let fromAmount: Double
     public let toAmount: Double
