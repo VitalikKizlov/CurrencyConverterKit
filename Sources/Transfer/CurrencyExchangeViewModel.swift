@@ -13,7 +13,7 @@ import Injection
 import Networking
 import Models
 
-public final class TransferViewModel {
+public final class CurrencyExchangeViewModel {
 
     // MARK: - Dependencies
 
@@ -130,14 +130,14 @@ public final class TransferViewModel {
     }
 }
 
-extension TransferViewModel {
+extension CurrencyExchangeViewModel {
     public enum LoadingState: Equatable {
         case idle(ExchangeData)
         case loading
         case loaded(ExchangeData)
         case failed(Error)
 
-        static public func == (lhs: TransferViewModel.LoadingState, rhs: TransferViewModel.LoadingState) -> Bool {
+        static public func == (lhs: CurrencyExchangeViewModel.LoadingState, rhs: CurrencyExchangeViewModel.LoadingState) -> Bool {
             switch (lhs, rhs) {
             case (.idle, .idle):
                 return true
