@@ -12,7 +12,7 @@ public final class ExchangeDataView: UIView {
 
     @AutoLayoutable private var titleLabel = UILabel()
     @AutoLayoutable private var countryView = CountryView()
-    @AutoLayoutable private var textfield = UITextField()
+    @AutoLayoutable private(set) var textfield = UITextField()
 
     // MARK: - Init
 

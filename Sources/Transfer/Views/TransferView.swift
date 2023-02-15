@@ -71,6 +71,30 @@ public final class TransferView: UIView {
                 self.viewAction.send(.swapViewTapped)
             }
             .store(in: &subscriptions)
+
+        senderExchangeDataView.textfield
+            .textPublisher
+            .debounce(for: 0.2, scheduler: DispatchQueue.main)
+            .sink { [weak self] text in
+                guard let self = self,
+                      let text = text
+                else { return }
+
+                self.viewAction.send(.senderAmountValueChanged(text))
+            }
+            .store(in: &subscriptions)
+
+        receiverExchangeDataView.textfield
+            .textPublisher
+            .debounce(for: 0.2, scheduler: DispatchQueue.main)
+            .sink { [weak self] text in
+                guard let self = self,
+                      let text = text
+                else { return }
+
+                self.viewAction.send(.receiverAmountValueChanged(text))
+            }
+            .store(in: &subscriptions)
     }
 
     // MARK: - Public
@@ -96,5 +120,7 @@ extension TransferView {
         case swapViewTapped
         case sendingFromViewTapped
         case receiveViewTapped
+        case senderAmountValueChanged(String)
+        case receiverAmountValueChanged(String)
     }
 }

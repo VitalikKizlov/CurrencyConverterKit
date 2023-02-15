@@ -30,7 +30,7 @@ public final class TransferViewModel {
     private var subscriptions: Set<AnyCancellable> = []
 
     public init() {
-        getRates()
+        getRatesFromSender()
 
         viewInput
             .sink { [weak self] action in
@@ -48,7 +48,19 @@ public final class TransferViewModel {
             exchangeData.swap()
             state = .idle(exchangeData)
 
-            getRates()
+            getRatesFromSender()
+        case .senderAmountValueChanged(let amount):
+            guard case .loaded(var exchangeData) = state else { return }
+            exchangeData.changeSenderAmount(Double(amount) ?? 0)
+
+            state = .idle(exchangeData)
+            getRatesFromSender()
+        case .receiverAmountValueChanged(let amount):
+            guard case .loaded(var exchangeData) = state else { return }
+            exchangeData.changeReceiverAmount(Double(amount) ?? 0)
+
+            state = .idle(exchangeData)
+            getRatesFromReceiver()
         case .sendingFromViewTapped:
             print("send from")
         case .receiveViewTapped:
@@ -65,7 +77,7 @@ public final class TransferViewModel {
         return .idle(exchangeData)
     }
 
-    private func getRates() {
+    private func getRatesFromSender() {
         guard case .idle(let exchangeData) = state else { return }
 
         let from = exchangeData.sender.country.currency.rawValue
@@ -77,15 +89,39 @@ public final class TransferViewModel {
             .sink { completion in
                 switch completion {
                 case .failure(let error):
-                    //self.state = .failed(error)
-                    print(error.localizedDescription)
+                    self.state = .failed(error)
                 case .finished:
-                    //self.state = .idle
-                    print("ffff")
+                    break
                 }
             } receiveValue: { [weak self] result in
                 let sender = SenderDataItem(country: exchangeData.sender.country, amount: result.fromAmount)
                 let receiver = ReceiverDataItem(country: exchangeData.receiver.country, amount: result.toAmount)
+                let exchangeData = ExchangeData(sender: sender, receiver: receiver)
+
+                self?.state = .loaded(exchangeData)
+            }
+            .store(in: &subscriptions)
+    }
+
+    private func getRatesFromReceiver() {
+        guard case .idle(let exchangeData) = state else { return }
+
+        let from = exchangeData.receiver.country.currency.rawValue
+        let to = exchangeData.sender.country.currency.rawValue
+        let amount = exchangeData.receiver.amount
+
+        let parameters = ExchangeRateParameters(from: from, to: to, amount: amount)
+        exchangeRateProvider.getExchangeRate(parameters)
+            .sink { completion in
+                switch completion {
+                case .failure(let error):
+                    self.state = .failed(error)
+                case .finished:
+                    break
+                }
+            } receiveValue: { [weak self] result in
+                let sender = SenderDataItem(country: exchangeData.sender.country, amount: result.toAmount)
+                let receiver = ReceiverDataItem(country: exchangeData.receiver.country, amount: result.fromAmount)
                 let exchangeData = ExchangeData(sender: sender, receiver: receiver)
 
                 self?.state = .loaded(exchangeData)

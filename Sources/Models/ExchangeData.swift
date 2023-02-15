@@ -25,6 +25,14 @@ public struct ExchangeData {
         receiver.country = temporarySender.country
         receiver.amount = temporarySender.amount
     }
+
+    mutating public func changeSenderAmount(_ amount: Double) {
+        sender.amount = amount
+    }
+
+    mutating public func changeReceiverAmount(_ amount: Double) {
+        receiver.amount = amount
+    }
 }
 
 public struct SenderDataItem {
