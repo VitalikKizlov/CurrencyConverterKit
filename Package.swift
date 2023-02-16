@@ -29,7 +29,8 @@ let package = Package(
                 "Models",
                 "Services",
                 .product(name: "CombineCocoa", package: "CombineCocoa"),
-            ]),
+            ],
+            resources: [.copy("Assets.xcassets")]),
         .testTarget(
             name: "TransferTests",
             dependencies: ["Transfer"]),

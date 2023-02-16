@@ -22,7 +22,7 @@ public final class CountriesStoreService: CountriesStoreProtocol {
     private var receiverCountryItem: Country = .ukraine
 
     public init() {
-
+        
     }
 
     public func countries() -> [Country] {
