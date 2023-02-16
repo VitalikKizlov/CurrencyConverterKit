@@ -62,7 +62,30 @@ public final class ExchangeRateService: ExchangeRateServiceProtocol {
     }
 
     public func getRatesFromReceiver() {
+        let from = exchangeData.receiver.country.currency.rawValue
+        let to = exchangeData.sender.country.currency.rawValue
+        let amount = exchangeData.receiver.amount
 
+        let parameters = ExchangeRateParameters(from: from, to: to, amount: amount)
+        exchangeRateProvider.getExchangeRate(parameters)
+            .sink { completion in
+                switch completion {
+                case .failure(let error):
+                    self.subject.send(completion: .failure(error))
+                case .finished:
+                    break
+                }
+            } receiveValue: { [weak self] result in
+                guard let self = self else { return }
+
+                let sender = SenderDataItem(country: self.exchangeData.sender.country, amount: result.toAmount)
+                let receiver = ReceiverDataItem(country: self.exchangeData.receiver.country, amount: result.fromAmount)
+                let exchangeData = ExchangeData(sender: sender, receiver: receiver)
+
+                self.exchangeData = exchangeData
+                self.subject.send(self.exchangeData)
+            }
+            .store(in: &subscriptions)
     }
 
     private static func exchangeData() -> ExchangeData {
