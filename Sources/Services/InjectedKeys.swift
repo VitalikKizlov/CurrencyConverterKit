@@ -16,3 +16,7 @@ public struct ExchangeRateProviderKey: InjectionKey {
 public struct ExchangeRateServiceKey: InjectionKey {
     public static var currentValue: ExchangeRateServiceProtocol = ExchangeRateService()
 }
+
+public struct CountriesStoreServiceKey: InjectionKey {
+    public static var currentValue: CountriesStoreProtocol = CountriesStoreService()
+}

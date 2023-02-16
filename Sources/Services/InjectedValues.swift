@@ -22,3 +22,10 @@ public extension InjectedValues {
         set { Self[ExchangeRateServiceKey.self] = newValue }
     }
 }
+
+public extension InjectedValues {
+    var countriesStoreService: CountriesStoreProtocol {
+        get { Self[CountriesStoreServiceKey.self] }
+        set { Self[CountriesStoreServiceKey.self] = newValue }
+    }
+}

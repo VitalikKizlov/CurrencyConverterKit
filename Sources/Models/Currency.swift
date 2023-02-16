@@ -11,5 +11,5 @@ public enum Currency: String, Codable {
     case pln = "PLN"
     case uah = "UAH"
     case eur = "EUR"
-    case usd = "USD"
+    case gbp = "GBP"
 }

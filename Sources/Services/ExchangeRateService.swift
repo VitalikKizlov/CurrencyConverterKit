@@ -25,36 +25,39 @@ public final class ExchangeRateService: ExchangeRateServiceProtocol {
     // MARK: - Dependencies
 
     @Injected(\.exchangeRateProvider) private var exchangeRateProvider: ExchangeRateProviding
+    @Injected(\.countriesStoreService) private var countriesStoreService: CountriesStoreProtocol
 
-    private var exchangeData = exchangeData()
+    private var exchangeData: ExchangeData?
     private var subscriptions: Set<AnyCancellable> = []
 
     private let exchangeDataSubject = PassthroughSubject<ExchangeData, Error>()
     public lazy var exchangeDataPublisher = exchangeDataSubject.eraseToAnyPublisher()
 
     public init() {
+        exchangeData = configureExchangeData()
         getRatesFromSender()
     }
 
     public func changeSenderAmount(_ amount: Double) {
-        exchangeData.changeSenderAmount(amount)
+        exchangeData?.changeSenderAmount(amount)
         getRatesFromSender()
     }
 
     public func changeReceiverAmount(_ amount: Double) {
-        exchangeData.changeReceiverAmount(amount)
+        exchangeData?.changeReceiverAmount(amount)
         getRatesFromReceiver()
     }
 
     public func performCurrenciesSwap() {
-        exchangeData.swap()
+        exchangeData?.swap()
         getRatesFromSender()
     }
 
     private func getRatesFromSender() {
-        let from = exchangeData.sender.country.currency.rawValue
-        let to = exchangeData.receiver.country.currency.rawValue
-        let amount = exchangeData.sender.amount
+        guard let from = exchangeData?.sender.country.currency.rawValue,
+              let to = exchangeData?.receiver.country.currency.rawValue,
+              let amount = exchangeData?.sender.amount
+        else { return }
 
         let parameters = ExchangeRateParameters(from: from, to: to, amount: amount)
         exchangeRateProvider.getExchangeRate(parameters)
@@ -66,22 +69,25 @@ public final class ExchangeRateService: ExchangeRateServiceProtocol {
                     print("finished")
                 }
             } receiveValue: { [weak self] result in
-                guard let self = self else { return }
+                guard let self = self,
+                      let exchangeData = self.exchangeData
+                else { return }
 
-                let sender = SenderDataItem(country: self.exchangeData.sender.country, amount: result.fromAmount)
-                let receiver = ReceiverDataItem(country: self.exchangeData.receiver.country, amount: result.toAmount)
-                let exchangeData = ExchangeData(sender: sender, receiver: receiver)
+                let sender = SenderDataItem(country: exchangeData.sender.country, amount: result.fromAmount)
+                let receiver = ReceiverDataItem(country: exchangeData.receiver.country, amount: result.toAmount)
+                let data = ExchangeData(sender: sender, receiver: receiver)
 
-                self.exchangeData = exchangeData
-                self.exchangeDataSubject.send(exchangeData)
+                self.exchangeData = data
+                self.exchangeDataSubject.send(data)
             }
             .store(in: &subscriptions)
     }
 
     private func getRatesFromReceiver() {
-        let from = exchangeData.receiver.country.currency.rawValue
-        let to = exchangeData.sender.country.currency.rawValue
-        let amount = exchangeData.receiver.amount
+        guard let from = exchangeData?.receiver.country.currency.rawValue,
+              let to = exchangeData?.sender.country.currency.rawValue,
+              let amount = exchangeData?.receiver.amount
+        else { return }
 
         let parameters = ExchangeRateParameters(from: from, to: to, amount: amount)
         exchangeRateProvider.getExchangeRate(parameters)
@@ -93,23 +99,25 @@ public final class ExchangeRateService: ExchangeRateServiceProtocol {
                     break
                 }
             } receiveValue: { [weak self] result in
-                guard let self = self else { return }
+                guard let self = self,
+                      let exchangeData = self.exchangeData
+                else { return }
 
-                let sender = SenderDataItem(country: self.exchangeData.sender.country, amount: result.toAmount)
-                let receiver = ReceiverDataItem(country: self.exchangeData.receiver.country, amount: result.fromAmount)
-                let exchangeData = ExchangeData(sender: sender, receiver: receiver)
+                let sender = SenderDataItem(country: exchangeData.sender.country, amount: result.toAmount)
+                let receiver = ReceiverDataItem(country: exchangeData.receiver.country, amount: result.fromAmount)
+                let data = ExchangeData(sender: sender, receiver: receiver)
 
-                self.exchangeData = exchangeData
-                self.exchangeDataSubject.send(exchangeData)
+                self.exchangeData = data
+                self.exchangeDataSubject.send(data)
             }
             .store(in: &subscriptions)
     }
 
-    private static func exchangeData() -> ExchangeData {
-        let poland = Country(image: UIImage(systemName: "flag")!, currency: .pln)
-        let ukraine = Country(image: UIImage(systemName: "flag")!, currency: .uah)
-        let sender = SenderDataItem(country: poland, amount: 300)
-        let receiver = ReceiverDataItem(country: ukraine, amount: 0)
+    private func configureExchangeData() -> ExchangeData {
+        let senderCountry = countriesStoreService.senderCountry()
+        let receiverCountry = countriesStoreService.receiverCountry()
+        let sender = SenderDataItem(country: senderCountry, amount: 300)
+        let receiver = ReceiverDataItem(country: receiverCountry, amount: 0)
         return ExchangeData(sender: sender, receiver: receiver)
     }
 }
