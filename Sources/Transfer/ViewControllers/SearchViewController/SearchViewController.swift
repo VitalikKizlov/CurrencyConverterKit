@@ -76,8 +76,9 @@ public final class SearchViewController: UIViewController {
                     self.hideSpinner()
                 case .loading:
                     self.showSpinner()
-                case .loaded:
+                case .loaded(let viewModels):
                     self.hideSpinner()
+                    self.updateSections(viewModels)
                 }
             }
             .store(in: &subscriptions)

@@ -10,7 +10,7 @@ import Utilities
 
 final class SearchCollectionViewCellView: UIView {
 
-    @AutoLayoutable private var companyLogo = UIImageView()
+    @AutoLayoutable private var imageView = UIImageView()
     @AutoLayoutable private var titleLabel = UILabel()
     @AutoLayoutable private var subTitleLabel = UILabel()
     @AutoLayoutable private var labelsStackView = UIStackView()
@@ -39,7 +39,7 @@ final class SearchCollectionViewCellView: UIView {
     }
 
     private func setupCompanyLogo() {
-        companyLogo.contentMode = .scaleAspectFit
+        imageView.contentMode = .scaleAspectFit
     }
 
     private func setupLabels() {
@@ -56,24 +56,25 @@ final class SearchCollectionViewCellView: UIView {
     }
 
     private func addSubviews() {
-        addSubview(companyLogo)
+        addSubview(imageView)
         addSubview(labelsStackView)
 
         NSLayoutConstraint.activate([
-            companyLogo.widthAnchor.constraint(equalToConstant: companyLogoSize.width),
-            companyLogo.heightAnchor.constraint(equalToConstant: companyLogoSize.height),
-            companyLogo.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 16),
-            companyLogo.centerYAnchor.constraint(equalTo: self.centerYAnchor),
+            imageView.widthAnchor.constraint(equalToConstant: companyLogoSize.width),
+            imageView.heightAnchor.constraint(equalToConstant: companyLogoSize.height),
+            imageView.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 16),
+            imageView.centerYAnchor.constraint(equalTo: self.centerYAnchor),
 
-            labelsStackView.topAnchor.constraint(equalTo: companyLogo.topAnchor),
-            labelsStackView.leadingAnchor.constraint(equalTo: companyLogo.trailingAnchor, constant: 16),
+            labelsStackView.topAnchor.constraint(equalTo: imageView.topAnchor),
+            labelsStackView.leadingAnchor.constraint(equalTo: imageView.trailingAnchor, constant: 16),
             labelsStackView.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -16),
-            labelsStackView.bottomAnchor.constraint(equalTo: companyLogo.bottomAnchor)
+            labelsStackView.bottomAnchor.constraint(equalTo: imageView.bottomAnchor)
         ])
     }
 
     func setup(_ viewModel: SearchItemViewModel) {
         titleLabel.text = viewModel.title
         subTitleLabel.text = viewModel.subtitle
+        imageView.image = viewModel.image
     }
 }

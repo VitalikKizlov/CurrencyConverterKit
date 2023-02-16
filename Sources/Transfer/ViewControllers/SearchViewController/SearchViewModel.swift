@@ -12,7 +12,7 @@ public final class SearchViewModel {
 
     // MARK: - Dependencies
 
-    
+    @Injected(\.countriesStoreService) private var countriesStoreService: CountriesStoreProtocol
 
     // MARK: - Input
 
@@ -23,15 +23,33 @@ public final class SearchViewModel {
     // MARK: - Properties
 
     @Published private(set) var state: LoadingState = .idle
+    private var context: Context
     private var subscriptions: Set<AnyCancellable> = []
 
     // MARK: - Lifecycle
 
-    public init() {
+    public init(_ context: Context) {
+        self.context = context
         setupBindings()
+        configureInitialState()
     }
 
     // MARK: - Private
+
+    private func configureInitialState() {
+        switch context {
+        case .sender:
+            let viewModels = countriesStoreService.countriesForSender().map { country in
+                return SearchItemViewModel(title: country.name, subtitle: country.currency.title, image: country.image)
+            }
+            state = .loaded(viewModels)
+        case .receiver:
+            let viewModels = countriesStoreService.countriesForReceiver().map { country in
+                return SearchItemViewModel(title: country.name, subtitle: country.currency.title, image: country.image)
+            }
+            state = .loaded(viewModels)
+        }
+    }
 
     private func setupBindings() {
         $searchText
@@ -60,10 +78,10 @@ public final class SearchViewModel {
             searchText = text
 
             if searchText.isEmpty {
-                self.state = .loaded
+                self.state = .loaded([])
             }
         case .cancelButtonClicked:
-            state = .loaded
+            state = .loaded([])
         }
     }
 
@@ -76,7 +94,7 @@ extension SearchViewModel {
     enum LoadingState: Equatable {
         case idle
         case loading
-        case loaded
+        case loaded([SearchItemViewModel])
         case failed(Error)
 
         static func == (lhs: SearchViewModel.LoadingState, rhs: SearchViewModel.LoadingState) -> Bool {
@@ -100,5 +118,12 @@ extension SearchViewModel {
     enum ViewInputEvent {
         case textDidChange(String)
         case cancelButtonClicked
+    }
+}
+
+extension SearchViewModel {
+    public enum Context {
+        case sender
+        case receiver
     }
 }

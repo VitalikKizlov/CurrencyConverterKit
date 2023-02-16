@@ -12,4 +12,17 @@ public enum Currency: String, Codable {
     case uah = "UAH"
     case eur = "EUR"
     case gbp = "GBP"
+
+    var title: String {
+        switch self {
+        case .pln:
+            return "Zloty • \(self.rawValue)"
+        case .uah:
+            return "Hrivna • \(self.rawValue)"
+        case .eur:
+            return "Euro • \(self.rawValue)"
+        case .gbp:
+            return "British Pound • \(self.rawValue)"
+        }
+    }
 }

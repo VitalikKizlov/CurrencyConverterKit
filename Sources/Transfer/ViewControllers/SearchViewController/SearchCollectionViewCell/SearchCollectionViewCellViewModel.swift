@@ -11,7 +11,7 @@ import UIKit
 struct SearchItemViewModel {
     let title: String
     let subtitle: String
-    let image: UIImage?
+    let image: UIImage
 }
 
 extension SearchItemViewModel: Hashable, Equatable {

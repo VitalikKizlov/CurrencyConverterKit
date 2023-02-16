@@ -8,7 +8,8 @@
 import Foundation
 
 public protocol CountriesStoreProtocol: AnyObject {
-    func countries() -> [Country]
+    func countriesForSender() -> [Country]
+    func countriesForReceiver() -> [Country]
     func senderCountry() -> Country
     func receiverCountry() -> Country
 }
@@ -20,11 +21,15 @@ public final class CountriesStoreService: CountriesStoreProtocol {
     private var receiverCountryItem: Country = .ukraine
 
     public init() {
-        
+
     }
 
-    public func countries() -> [Country] {
-        return countryItems
+    public func countriesForSender() -> [Country] {
+        return countryItems.filter({ $0 != senderCountryItem })
+    }
+
+    public func countriesForReceiver() -> [Country] {
+        return countryItems.filter({ $0 != receiverCountryItem })
     }
 
     public func senderCountry() -> Country {

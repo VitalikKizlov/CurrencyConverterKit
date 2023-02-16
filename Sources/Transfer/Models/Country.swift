@@ -8,20 +8,22 @@
 import UIKit
 
 public struct Country {
+    public let name: String
     public let image: UIImage
     public let currency: Currency
 
-    public init(image: UIImage, currency: Currency) {
+    public init(name: String, image: UIImage, currency: Currency) {
+        self.name = name
         self.image = image
         self.currency = currency
     }
 }
 
 public extension Country {
-    static let poland = Country(image: UIImage(named: "pol", in: .module, with: nil)!, currency: .pln)
-    static let ukraine = Country(image: UIImage(named: "ukr", in: .module, with: nil)!, currency: .uah)
-    static let germany = Country(image: UIImage(named: "ger", in: .module, with: nil)!, currency: .eur)
-    static let greatBritain = Country(image: UIImage(named: "gbp", in: .module, with: nil)!, currency: .gbp)
+    static let poland = Country(name: "Poland", image: UIImage(named: "pol", in: .module, with: nil)!, currency: .pln)
+    static let ukraine = Country(name: "Ukraine", image: UIImage(named: "ukr", in: .module, with: nil)!, currency: .uah)
+    static let germany = Country(name: "Germany", image: UIImage(named: "ger", in: .module, with: nil)!, currency: .eur)
+    static let greatBritain = Country(name: "Great Britain", image: UIImage(named: "gbp", in: .module, with: nil)!, currency: .gbp)
 }
 
 extension Country: Hashable, Equatable {
