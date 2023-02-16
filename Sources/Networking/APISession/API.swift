@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Utilities
 
 public struct API {
     static var backendURL = "my.transfergo.com"

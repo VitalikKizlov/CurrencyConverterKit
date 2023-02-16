@@ -23,21 +23,17 @@ let package = Package(
         .target(
             name: "Transfer",
             dependencies: [
-                "Utilities",
                 "Injection",
                 "Networking",
                 "Models",
-                "Services",
                 .product(name: "CombineCocoa", package: "CombineCocoa"),
             ],
             resources: [.copy("Assets.xcassets")]),
         .testTarget(
             name: "TransferTests",
             dependencies: ["Transfer"]),
-        .target(name: "Utilities", dependencies: []),
         .target(name: "Injection", dependencies: ["Networking"]),
-        .target(name: "Networking", dependencies: ["Utilities", "Models"]),
+        .target(name: "Networking", dependencies: ["Models"]),
         .target(name: "Models", dependencies: []),
-        .target(name: "Services", dependencies: ["Networking", "Injection"])
     ]
 )
