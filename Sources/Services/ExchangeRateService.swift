@@ -13,8 +13,11 @@ import Injection
 import Models
 
 public protocol ExchangeRateServiceProtocol: AnyObject {
-    func getRatesFromSender()
-    func getRatesFromReceiver()
+    func changeSenderAmount(_ amount: Double)
+    func changeReceiverAmount(_ amount: Double)
+    func performCurrenciesSwap()
+
+    var exchangeDataPublisher: AnyPublisher<ExchangeData, Error> { get }
 }
 
 public final class ExchangeRateService: ExchangeRateServiceProtocol {
@@ -26,15 +29,29 @@ public final class ExchangeRateService: ExchangeRateServiceProtocol {
     private var exchangeData = exchangeData()
     private var subscriptions: Set<AnyCancellable> = []
 
-    private let subject = PassthroughSubject<ExchangeData, Error>()
+    private let exchangeDataSubject = PassthroughSubject<ExchangeData, Error>()
+    public lazy var exchangeDataPublisher = exchangeDataSubject.eraseToAnyPublisher()
 
     public init() {
-        subject.send(exchangeData)
-
         getRatesFromSender()
     }
 
-    public func getRatesFromSender() {
+    public func changeSenderAmount(_ amount: Double) {
+        exchangeData.changeSenderAmount(amount)
+        getRatesFromSender()
+    }
+
+    public func changeReceiverAmount(_ amount: Double) {
+        exchangeData.changeReceiverAmount(amount)
+        getRatesFromReceiver()
+    }
+
+    public func performCurrenciesSwap() {
+        exchangeData.swap()
+        getRatesFromSender()
+    }
+
+    private func getRatesFromSender() {
         let from = exchangeData.sender.country.currency.rawValue
         let to = exchangeData.receiver.country.currency.rawValue
         let amount = exchangeData.sender.amount
@@ -44,9 +61,9 @@ public final class ExchangeRateService: ExchangeRateServiceProtocol {
             .sink { completion in
                 switch completion {
                 case .failure(let error):
-                    self.subject.send(completion: .failure(error))
+                    self.exchangeDataSubject.send(completion: .failure(error))
                 case .finished:
-                    break
+                    print("finished")
                 }
             } receiveValue: { [weak self] result in
                 guard let self = self else { return }
@@ -56,12 +73,12 @@ public final class ExchangeRateService: ExchangeRateServiceProtocol {
                 let exchangeData = ExchangeData(sender: sender, receiver: receiver)
 
                 self.exchangeData = exchangeData
-                self.subject.send(self.exchangeData)
+                self.exchangeDataSubject.send(exchangeData)
             }
             .store(in: &subscriptions)
     }
 
-    public func getRatesFromReceiver() {
+    private func getRatesFromReceiver() {
         let from = exchangeData.receiver.country.currency.rawValue
         let to = exchangeData.sender.country.currency.rawValue
         let amount = exchangeData.receiver.amount
@@ -71,7 +88,7 @@ public final class ExchangeRateService: ExchangeRateServiceProtocol {
             .sink { completion in
                 switch completion {
                 case .failure(let error):
-                    self.subject.send(completion: .failure(error))
+                    self.exchangeDataSubject.send(completion: .failure(error))
                 case .finished:
                     break
                 }
@@ -83,7 +100,7 @@ public final class ExchangeRateService: ExchangeRateServiceProtocol {
                 let exchangeData = ExchangeData(sender: sender, receiver: receiver)
 
                 self.exchangeData = exchangeData
-                self.subject.send(self.exchangeData)
+                self.exchangeDataSubject.send(exchangeData)
             }
             .store(in: &subscriptions)
     }

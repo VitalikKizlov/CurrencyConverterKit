@@ -75,10 +75,11 @@ public final class CurrencyConverterView: UIView {
         senderExchangeDataView.textfield
             .textPublisher
             .debounce(for: 0.2, scheduler: DispatchQueue.main)
+            .compactMap({ $0 })
             .sink { [weak self] text in
-                guard let self = self,
-                      let text = text
-                else { return }
+                guard let self = self else { return }
+
+                if text.isEmpty { return }
 
                 self.viewAction.send(.senderAmountValueChanged(text))
             }
@@ -87,10 +88,11 @@ public final class CurrencyConverterView: UIView {
         receiverExchangeDataView.textfield
             .textPublisher
             .debounce(for: 0.2, scheduler: DispatchQueue.main)
+            .compactMap({ $0 })
             .sink { [weak self] text in
-                guard let self = self,
-                      let text = text
-                else { return }
+                guard let self = self else { return }
+
+                if text.isEmpty { return }
 
                 self.viewAction.send(.receiverAmountValueChanged(text))
             }
