@@ -27,7 +27,7 @@ public final class CurrencyExchangeViewModel {
 
     // MARK: - Properties
 
-    @Published public var state: LoadingState = viewModelIdleState()
+    @Published public var state: LoadingState = .idle
     private var subscriptions: Set<AnyCancellable> = []
 
     public init() {
@@ -69,20 +69,11 @@ public final class CurrencyExchangeViewModel {
             print("send to")
         }
     }
-
-    private static func viewModelIdleState() -> LoadingState {
-        let poland = Country(image: UIImage(systemName: "flag")!, currency: .pln)
-        let ukraine = Country(image: UIImage(systemName: "flag")!, currency: .uah)
-        let sender = SenderDataItem(country: poland, amount: 300)
-        let receiver = ReceiverDataItem(country: ukraine, amount: 0)
-        let exchangeData = ExchangeData(sender: sender, receiver: receiver)
-        return .idle(exchangeData)
-    }
 }
 
 extension CurrencyExchangeViewModel {
     public enum LoadingState: Equatable {
-        case idle(ExchangeData)
+        case idle
         case loading
         case loaded(ExchangeData)
         case failed(Error)
