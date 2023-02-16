@@ -10,7 +10,6 @@ import UIKit
 import Combine
 import Networking
 import Injection
-import Models
 
 public protocol ExchangeRateServiceProtocol: AnyObject {
     func changeSenderAmount(_ amount: Double)

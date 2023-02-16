@@ -18,10 +18,10 @@ public struct Country {
 }
 
 public extension Country {
-    static let poland = Country(image: UIImage(systemName: "flag")!, currency: .pln)
-    static let ukraine = Country(image: UIImage(systemName: "flag")!, currency: .uah)
-    static let germany = Country(image: UIImage(systemName: "flag")!, currency: .eur)
-    static let greatBritain = Country(image: UIImage(systemName: "flag")!, currency: .gbp)
+    static let poland = Country(image: UIImage(named: "pol", in: .module, with: nil)!, currency: .pln)
+    static let ukraine = Country(image: UIImage(named: "ukr", in: .module, with: nil)!, currency: .uah)
+    static let germany = Country(image: UIImage(named: "ger", in: .module, with: nil)!, currency: .eur)
+    static let greatBritain = Country(image: UIImage(named: "gbp", in: .module, with: nil)!, currency: .gbp)
 }
 
 extension Country: Hashable, Equatable {

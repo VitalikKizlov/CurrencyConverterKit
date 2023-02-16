@@ -7,7 +7,6 @@
 
 import Foundation
 import Combine
-import Models
 
 public protocol ExchangeRateProviding {
     func getExchangeRate(_ parameters: ExchangeRateParameters) -> AnyPublisher<ExchangeRateData, Error>
