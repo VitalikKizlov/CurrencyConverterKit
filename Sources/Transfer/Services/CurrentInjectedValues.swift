@@ -6,8 +6,6 @@
 //
 
 import Foundation
-import Injection
-import Networking
 
 public extension InjectedValues {
     var exchangeRateProvider: ExchangeRateProviding {
