@@ -12,7 +12,7 @@ public struct ExchangeRateProviderKey: InjectionKey {
 }
 
 public struct ExchangeRateServiceKey: InjectionKey {
-    public static var currentValue: ExchangeRateServiceProtocol = ExchangeRateService()
+    public static var currentValue: ExchangeRateServiceProtocol = ProcessInfo.isRunningUnitTests ? MockExchangeRateService() : ExchangeRateService()
 }
 
 public struct CountriesStoreServiceKey: InjectionKey {

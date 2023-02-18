@@ -14,6 +14,7 @@ public protocol ExchangeRateServiceProtocol: AnyObject {
     func performCurrenciesSwap()
     func validateSenderAmount(_ amount: Double)
 
+    var exchangeData: ExchangeData? { get }
     var exchangeDataPublisher: AnyPublisher<ExchangeData, Error> { get }
     var isAmountValidPublisher: AnyPublisher<AmountValidParameters, Never> { get }
 }
@@ -32,7 +33,7 @@ public final class ExchangeRateService: ExchangeRateServiceProtocol {
 
     // MARK: - Properties
 
-    private var exchangeData: ExchangeData?
+    public private(set) var exchangeData: ExchangeData?
     private var subscriptions: Set<AnyCancellable> = []
 
     private let exchangeDataSubject = PassthroughSubject<ExchangeData, Error>()
