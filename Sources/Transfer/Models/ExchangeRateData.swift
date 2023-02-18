@@ -14,3 +14,7 @@ public struct ExchangeRateData: Codable {
     public let fromAmount: Double
     public let toAmount: Double
 }
+
+extension ExchangeRateData: Equatable {
+    
+}

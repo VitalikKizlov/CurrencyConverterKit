@@ -8,8 +8,6 @@
 import Foundation
 import UIKit
 import Combine
-import Networking
-import Injection
 
 public protocol ExchangeRateServiceProtocol: AnyObject {
     func changeReceiverAmount(_ amount: Double)

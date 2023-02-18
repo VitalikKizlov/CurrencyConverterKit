@@ -8,7 +8,7 @@
 import Foundation
 
 public struct ExchangeRateProviderKey: InjectionKey {
-    public static var currentValue: ExchangeRateProviding = ExchangeRateProvider()
+    public static var currentValue: ExchangeRateProviding = ProcessInfo.isRunningUnitTests ? MockExchangeRateProvider() : ExchangeRateProvider()
 }
 
 public struct ExchangeRateServiceKey: InjectionKey {
