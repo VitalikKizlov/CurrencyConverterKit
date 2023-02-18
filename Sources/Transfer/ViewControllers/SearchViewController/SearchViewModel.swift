@@ -17,8 +17,13 @@ public final class SearchViewModel {
     // MARK: - Input
 
     @Published private(set) var searchText = ""
-    let viewInputEventSubject = PassthroughSubject<ViewInputEvent, Never>()
-    private lazy var viewInputEventPublisher = viewInputEventSubject.eraseToAnyPublisher()
+    let viewInputEvent = PassthroughSubject<ViewInputEvent, Never>()
+    private lazy var viewInputEventPublisher = viewInputEvent.eraseToAnyPublisher()
+
+    // MARK: - Output
+
+    private let viewOutputEvent = PassthroughSubject<ViewOutputEvent, Never>()
+    lazy var viewOutputEventPublisher = viewOutputEvent.eraseToAnyPublisher()
 
     // MARK: - Properties
 
@@ -55,9 +60,7 @@ public final class SearchViewModel {
         $searchText
             .debounce(for: 0.2, scheduler: DispatchQueue.main)
             .removeDuplicates()
-            .filter { value in
-                return value.count > 1
-            }
+            .filter { !$0.isEmpty }
             .sink { [weak self] _ in
                 guard let self = self else { return }
                 self.search()
@@ -78,15 +81,39 @@ public final class SearchViewModel {
             searchText = text
 
             if searchText.isEmpty {
-                self.state = .loaded([])
+                configureInitialState()
             }
         case .cancelButtonClicked:
-            state = .loaded([])
+            configureInitialState()
+        case .didSelectItem(let indexPath):
+            proceedItemSelection(at: indexPath)
+
+            viewOutputEvent.send(.dismiss)
         }
     }
 
     private func search() {
-        state = .loading
+        guard case .loaded(let array) = state else {
+            return
+        }
+
+        let filtered = array.filter({ $0.title.lowercased().contains(searchText.lowercased()) })
+        state = .loaded(filtered)
+    }
+
+    private func proceedItemSelection(at indexPath: IndexPath) {
+        guard case .loaded(let array) = state else {
+            return
+        }
+
+        let name = array[indexPath.item].title
+
+        switch context {
+        case .receiver:
+            countriesStoreService.configureReceiverCountry(for: name)
+        case .sender:
+            countriesStoreService.configureSenderCountry(for: name)
+        }
     }
 }
 
@@ -118,6 +145,11 @@ extension SearchViewModel {
     enum ViewInputEvent {
         case textDidChange(String)
         case cancelButtonClicked
+        case didSelectItem(IndexPath)
+    }
+
+    enum ViewOutputEvent {
+        case dismiss
     }
 }
 

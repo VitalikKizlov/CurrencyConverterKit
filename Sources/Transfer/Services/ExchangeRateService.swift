@@ -35,6 +35,14 @@ public final class ExchangeRateService: ExchangeRateServiceProtocol {
     public init() {
         exchangeData = configureExchangeData()
         getRatesFromSender()
+
+        countriesStoreService.countryItemSubjectPublisher
+            .sink { [weak self] _ in
+                guard let self = self else { return }
+                self.exchangeData = self.configureExchangeData()
+                self.getRatesFromSender()
+            }
+            .store(in: &subscriptions)
     }
 
     public func changeSenderAmount(_ amount: Double) {

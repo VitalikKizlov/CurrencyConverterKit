@@ -29,11 +29,6 @@ public final class SearchViewController: UIViewController {
     }()
 
     @AutoLayoutable private var collectionView = SearchCollectionView()
-    @AutoLayoutable private var spinnerView: UIActivityIndicatorView = {
-        let spinnerView = UIActivityIndicatorView(style: .medium)
-        spinnerView.hidesWhenStopped = true
-        return spinnerView
-    }()
 
     typealias DataSource = UICollectionViewDiffableDataSource<Section, SearchItemViewModel>
     typealias Snapshot = NSDiffableDataSourceSnapshot<Section, SearchItemViewModel>
@@ -73,12 +68,22 @@ public final class SearchViewController: UIViewController {
                 case .idle:
                     break
                 case .failed(let error):
-                    self.hideSpinner()
+                    print(error.localizedDescription)
                 case .loading:
-                    self.showSpinner()
+                    print("loading")
                 case .loaded(let viewModels):
-                    self.hideSpinner()
                     self.updateSections(viewModels)
+                }
+            }
+            .store(in: &subscriptions)
+
+        viewModel
+            .viewOutputEventPublisher
+            .sink { [weak self] event in
+                guard let self = self else { return }
+                switch event {
+                case .dismiss:
+                    self.dismiss(animated: true)
                 }
             }
             .store(in: &subscriptions)
@@ -87,7 +92,7 @@ public final class SearchViewController: UIViewController {
             .textDidChangePublisher
             .sink { [weak self] text in
                 guard let self = self else { return }
-                self.viewModel.viewInputEventSubject.send(.textDidChange(text))
+                self.viewModel.viewInputEvent.send(.textDidChange(text))
                 self.searchBar.setShowsCancelButton(true, animated: true)
             }
             .store(in: &subscriptions)
@@ -104,7 +109,7 @@ public final class SearchViewController: UIViewController {
             .cancelButtonClickedPublisher
             .sink { [weak self] _ in
                 guard let self = self else { return }
-                self.viewModel.viewInputEventSubject.send(.cancelButtonClicked)
+                self.viewModel.viewInputEvent.send(.cancelButtonClicked)
                 self.clearSearchBarState()
             }
             .store(in: &subscriptions)
@@ -113,7 +118,6 @@ public final class SearchViewController: UIViewController {
     private func configureUI() {
         configureSearchBar()
         configureCollectionView()
-        configureSpinnerView()
     }
 
     private func configureSearchBar() {
@@ -128,6 +132,7 @@ public final class SearchViewController: UIViewController {
     }
 
     private func configureCollectionView() {
+        collectionView.delegate = self
         view.addSubview(collectionView)
 
         NSLayoutConstraint.activate([
@@ -135,15 +140,6 @@ public final class SearchViewController: UIViewController {
             collectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
             collectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
             collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
-        ])
-    }
-
-    private func configureSpinnerView() {
-        view.addSubview(spinnerView)
-
-        NSLayoutConstraint.activate([
-            spinnerView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            spinnerView.centerXAnchor.constraint(equalTo: view.centerXAnchor)
         ])
     }
 
@@ -173,12 +169,12 @@ public final class SearchViewController: UIViewController {
         searchBar.text = nil
         searchBar.resignFirstResponder()
     }
+}
 
-    private func showSpinner() {
-        spinnerView.startAnimating()
-    }
+// MARK: - UICollectionViewDelegate
 
-    private func hideSpinner() {
-        spinnerView.stopAnimating()
+extension SearchViewController: UICollectionViewDelegate {
+    public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        viewModel.viewInputEvent.send(.didSelectItem(indexPath))
     }
 }
