@@ -16,6 +16,7 @@ public final class CurrencyConverterView: UIView {
     @AutoLayoutable private var senderExchangeDataView = ExchangeDataView()
     @AutoLayoutable private var receiverExchangeDataView = ExchangeDataView()
     @AutoLayoutable private var swapView = SwapView()
+    @AutoLayoutable private var errorLabel = UILabel()
 
     private let viewAction = PassthroughSubject<ViewAction, Never>()
     public lazy var viewActionPublisher = viewAction.eraseToAnyPublisher()
@@ -41,8 +42,12 @@ public final class CurrencyConverterView: UIView {
     private func setupSubviews() {
         stackView.axis = .vertical
         stackView.spacing = 36
-        stackView.distribution = .fillEqually
+        stackView.distribution = .fill
         stackView.alignment = .fill
+
+        errorLabel.textColor = .red
+        errorLabel.numberOfLines = 1
+        errorLabel.isHidden = true
     }
 
     private func addSubviews() {
@@ -51,15 +56,23 @@ public final class CurrencyConverterView: UIView {
 
         addSubview(stackView)
         addSubview(swapView)
-
-        let constraints = stackView.constraintsForAnchoringTo(boundsOf: self, padding: 8)
-        NSLayoutConstraint.activate(constraints)
+        addSubview(errorLabel)
 
         NSLayoutConstraint.activate([
-            swapView.centerYAnchor.constraint(equalTo: centerYAnchor),
-            swapView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 44),
+            stackView.topAnchor.constraint(equalTo: topAnchor, constant: 8),
+            stackView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 8),
+            stackView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -8),
+
+            swapView.centerYAnchor.constraint(equalTo: stackView.centerYAnchor),
+            swapView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 36),
             swapView.widthAnchor.constraint(equalToConstant: 36),
-            swapView.heightAnchor.constraint(equalToConstant: 36)
+            swapView.heightAnchor.constraint(equalToConstant: 36),
+
+            errorLabel.topAnchor.constraint(equalTo: stackView.bottomAnchor),
+            errorLabel.leadingAnchor.constraint(equalTo: stackView.leadingAnchor),
+            errorLabel.trailingAnchor.constraint(equalTo: stackView.trailingAnchor),
+            errorLabel.bottomAnchor.constraint(equalTo: bottomAnchor),
+            errorLabel.heightAnchor.constraint(equalToConstant: 36)
         ])
     }
 
@@ -120,6 +133,13 @@ public final class CurrencyConverterView: UIView {
     public func configure(_ viewModel: TransferViewViewModel) {
         senderExchangeDataView.configure(viewModel.senderViewViewModel)
         receiverExchangeDataView.configure(viewModel.receiverViewViewModel)
+
+        errorLabel.isHidden = true
+    }
+
+    public func configureErrorState(_ viewModel: TransferViewErrorViewModel) {
+        errorLabel.text = viewModel.message
+        errorLabel.isHidden = false
     }
 }
 
@@ -130,6 +150,18 @@ public struct TransferViewViewModel {
     public init(senderViewViewModel: ExchangeDataViewViewModel, receiverViewViewModel: ExchangeDataViewViewModel) {
         self.senderViewViewModel = senderViewViewModel
         self.receiverViewViewModel = receiverViewViewModel
+    }
+}
+
+public struct TransferViewErrorViewModel {
+    public let currency: Currency
+
+    public var message: String {
+        return "Maximum sending amount \(currency.limit) \(currency.rawValue)"
+    }
+
+    public init(_ currency: Currency) {
+        self.currency = currency
     }
 }
 

@@ -22,9 +22,15 @@ public final class CurrencyExchangeViewModel {
     public let viewInput = PassthroughSubject<CurrencyConverterView.ViewAction, Never>()
     private lazy var viewInputPublisher = viewInput.eraseToAnyPublisher()
 
-    // MARK: - Properties
+    // MARK: - Output
 
     @Published public var state: LoadingState = .idle
+
+    private let isAmountValidSubject = PassthroughSubject<AmountValidParameters, Never>()
+    public lazy var isAmountValidPublisher = isAmountValidSubject.eraseToAnyPublisher()
+
+    // MARK: - Properties
+
     private var subscriptions: Set<AnyCancellable> = []
 
     public init() {
@@ -50,6 +56,15 @@ public final class CurrencyExchangeViewModel {
                 self.state = .loaded(exchangeData)
             })
             .store(in: &subscriptions)
+
+        exchangeRateService
+            .isAmountValidPublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] parameters in
+                guard let self = self else { return }
+                self.isAmountValidSubject.send(parameters)
+            }
+            .store(in: &subscriptions)
     }
 
     private func proceedViewAction(_ action: CurrencyConverterView.ViewAction) {
@@ -57,7 +72,7 @@ public final class CurrencyExchangeViewModel {
         case .swapViewTapped:
             exchangeRateService.performCurrenciesSwap()
         case .senderAmountValueChanged(let amount):
-            exchangeRateService.changeSenderAmount(Double(amount) ?? 0)
+            exchangeRateService.validateSenderAmount(Double(amount) ?? 0)
         case .receiverAmountValueChanged(let amount):
             exchangeRateService.changeReceiverAmount(Double(amount) ?? 0)
         case .sendingFromViewTapped:

@@ -12,11 +12,17 @@ import Networking
 import Injection
 
 public protocol ExchangeRateServiceProtocol: AnyObject {
-    func changeSenderAmount(_ amount: Double)
     func changeReceiverAmount(_ amount: Double)
     func performCurrenciesSwap()
+    func validateSenderAmount(_ amount: Double)
 
     var exchangeDataPublisher: AnyPublisher<ExchangeData, Error> { get }
+    var isAmountValidPublisher: AnyPublisher<AmountValidParameters, Never> { get }
+}
+
+public struct AmountValidParameters {
+    public let isValid: Bool
+    public let currency: Currency
 }
 
 public final class ExchangeRateService: ExchangeRateServiceProtocol {
@@ -26,11 +32,18 @@ public final class ExchangeRateService: ExchangeRateServiceProtocol {
     @Injected(\.exchangeRateProvider) private var exchangeRateProvider: ExchangeRateProviding
     @Injected(\.countriesStoreService) private var countriesStoreService: CountriesStoreProtocol
 
+    // MARK: - Properties
+
     private var exchangeData: ExchangeData?
     private var subscriptions: Set<AnyCancellable> = []
 
     private let exchangeDataSubject = PassthroughSubject<ExchangeData, Error>()
     public lazy var exchangeDataPublisher = exchangeDataSubject.eraseToAnyPublisher()
+
+    private let isAmountValidSubject = PassthroughSubject<AmountValidParameters, Never>()
+    public lazy var isAmountValidPublisher = isAmountValidSubject.eraseToAnyPublisher()
+
+    // MARK: - Init
 
     public init() {
         exchangeData = configureExchangeData()
@@ -45,11 +58,6 @@ public final class ExchangeRateService: ExchangeRateServiceProtocol {
             .store(in: &subscriptions)
     }
 
-    public func changeSenderAmount(_ amount: Double) {
-        exchangeData?.changeSenderAmount(amount)
-        getRatesFromSender()
-    }
-
     public func changeReceiverAmount(_ amount: Double) {
         exchangeData?.changeReceiverAmount(amount)
         getRatesFromReceiver()
@@ -58,6 +66,10 @@ public final class ExchangeRateService: ExchangeRateServiceProtocol {
     public func performCurrenciesSwap() {
         exchangeData?.swap()
         getRatesFromSender()
+    }
+
+    public func validateSenderAmount(_ amount: Double) {
+        performAmountValidation(amount)
     }
 
     private func getRatesFromSender() {
@@ -126,5 +138,23 @@ public final class ExchangeRateService: ExchangeRateServiceProtocol {
         let sender = SenderDataItem(country: senderCountry, amount: 300)
         let receiver = ReceiverDataItem(country: receiverCountry, amount: 0)
         return ExchangeData(sender: sender, receiver: receiver)
+    }
+
+    private func changeSenderAmount(_ amount: Double) {
+        exchangeData?.changeSenderAmount(amount)
+        getRatesFromSender()
+    }
+
+    private func performAmountValidation(_ amount: Double) {
+        guard let data = exchangeData else { return }
+
+        let isValid = data.sender.country.currency.limit > amount
+
+        if isValid {
+            changeSenderAmount(amount)
+        }
+
+        let parameters = AmountValidParameters(isValid: isValid, currency: data.sender.country.currency)
+        isAmountValidSubject.send(parameters)
     }
 }

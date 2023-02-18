@@ -25,4 +25,17 @@ public enum Currency: String, Codable {
             return "British Pound • \(self.rawValue)"
         }
     }
+
+    var limit: Double {
+        switch self {
+        case .pln:
+            return 20000
+        case .uah:
+            return 50000
+        case .eur:
+            return 5000
+        case .gbp:
+            return 1000
+        }
+    }
 }
