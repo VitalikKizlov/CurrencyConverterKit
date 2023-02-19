@@ -2,24 +2,13 @@
 //  File.swift
 //  
 //
-//  Created by Vitalii Kizlov on 16.02.2023.
+//  Created by Vitalii Kizlov on 19.02.2023.
 //
 
 import Foundation
 import Combine
 
-public protocol CountriesStoreProtocol: AnyObject {
-    func countriesForSender() -> [Country]
-    func countriesForReceiver() -> [Country]
-    func senderCountry() -> Country
-    func receiverCountry() -> Country
-    func configureSenderCountry(for name: String)
-    func configureReceiverCountry(for name: String)
-
-    var countryItemSubjectPublisher: AnyPublisher<Void, Never> { get }
-}
-
-public final class CountriesStoreService: CountriesStoreProtocol {
+public final class MockCountriesStoreService: CountriesStoreProtocol {
 
     private var countryItems: [Country] = [.poland, .ukraine, .germany, .greatBritain]
     private var senderCountryItem: Country = .poland
