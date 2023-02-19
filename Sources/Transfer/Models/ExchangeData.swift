@@ -10,10 +10,16 @@ import Foundation
 public struct ExchangeData {
     public var sender: SenderDataItem
     public var receiver: ReceiverDataItem
+    public let rate: Double?
 
-    public init(sender: SenderDataItem, receiver: ReceiverDataItem) {
+    public init(
+        sender: SenderDataItem,
+        receiver: ReceiverDataItem,
+        rate: Double? = nil
+    ) {
         self.sender = sender
         self.receiver = receiver
+        self.rate = rate
     }
 
     mutating public func swap() {

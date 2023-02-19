@@ -93,7 +93,7 @@ public final class ExchangeRateService: ExchangeRateServiceProtocol {
 
                 let sender = SenderDataItem(country: exchangeData.sender.country, amount: result.fromAmount)
                 let receiver = ReceiverDataItem(country: exchangeData.receiver.country, amount: result.toAmount)
-                let data = ExchangeData(sender: sender, receiver: receiver)
+                let data = ExchangeData(sender: sender, receiver: receiver, rate: result.rate)
 
                 self.exchangeData = data
                 self.exchangeDataSubject.send(data)
@@ -123,7 +123,7 @@ public final class ExchangeRateService: ExchangeRateServiceProtocol {
 
                 let sender = SenderDataItem(country: exchangeData.sender.country, amount: result.toAmount)
                 let receiver = ReceiverDataItem(country: exchangeData.receiver.country, amount: result.fromAmount)
-                let data = ExchangeData(sender: sender, receiver: receiver)
+                let data = ExchangeData(sender: sender, receiver: receiver, rate: result.rate)
 
                 self.exchangeData = data
                 self.exchangeDataSubject.send(data)

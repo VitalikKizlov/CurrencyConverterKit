@@ -16,6 +16,7 @@ public final class CurrencyConverterView: UIView {
     @AutoLayoutable private var senderExchangeDataView = ExchangeDataView()
     @AutoLayoutable private var receiverExchangeDataView = ExchangeDataView()
     @AutoLayoutable private var swapView = SwapView()
+    @AutoLayoutable private var exchangeRateView = ExchangeRateView()
     @AutoLayoutable private var errorLabel = UILabel()
 
     private let viewAction = PassthroughSubject<ViewAction, Never>()
@@ -56,6 +57,7 @@ public final class CurrencyConverterView: UIView {
 
         addSubview(stackView)
         addSubview(swapView)
+        addSubview(exchangeRateView)
         addSubview(errorLabel)
 
         NSLayoutConstraint.activate([
@@ -67,6 +69,10 @@ public final class CurrencyConverterView: UIView {
             swapView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 36),
             swapView.widthAnchor.constraint(equalToConstant: 36),
             swapView.heightAnchor.constraint(equalToConstant: 36),
+
+            exchangeRateView.centerYAnchor.constraint(equalTo: swapView.centerYAnchor),
+            exchangeRateView.leadingAnchor.constraint(equalTo: swapView.trailingAnchor, constant: 24),
+            exchangeRateView.trailingAnchor.constraint(greaterThanOrEqualTo: trailingAnchor, constant: -16),
 
             errorLabel.topAnchor.constraint(equalTo: stackView.bottomAnchor),
             errorLabel.leadingAnchor.constraint(equalTo: stackView.leadingAnchor),
@@ -133,7 +139,7 @@ public final class CurrencyConverterView: UIView {
     public func configure(_ viewModel: TransferViewViewModel) {
         senderExchangeDataView.configure(viewModel.senderViewViewModel)
         receiverExchangeDataView.configure(viewModel.receiverViewViewModel)
-
+        exchangeRateView.configure(viewModel.exchangeRateViewViewModel)
         errorLabel.isHidden = true
     }
 
@@ -146,10 +152,16 @@ public final class CurrencyConverterView: UIView {
 public struct TransferViewViewModel {
     public let senderViewViewModel: ExchangeDataViewViewModel
     public let receiverViewViewModel: ExchangeDataViewViewModel
+    public let exchangeRateViewViewModel: ExchangeRateViewViewModel
 
-    public init(senderViewViewModel: ExchangeDataViewViewModel, receiverViewViewModel: ExchangeDataViewViewModel) {
+    public init(
+        senderViewViewModel: ExchangeDataViewViewModel,
+        receiverViewViewModel: ExchangeDataViewViewModel,
+        exchangeRateViewViewModel: ExchangeRateViewViewModel
+    ) {
         self.senderViewViewModel = senderViewViewModel
         self.receiverViewViewModel = receiverViewViewModel
+        self.exchangeRateViewViewModel = exchangeRateViewViewModel
     }
 }
 
