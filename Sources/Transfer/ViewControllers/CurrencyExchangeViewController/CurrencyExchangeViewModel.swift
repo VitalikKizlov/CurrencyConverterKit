@@ -75,10 +75,8 @@ public final class CurrencyExchangeViewModel {
             exchangeRateService.validateSenderAmount(Double(amount) ?? 0)
         case .receiverAmountValueChanged(let amount):
             exchangeRateService.changeReceiverAmount(Double(amount) ?? 0)
-        case .sendingFromViewTapped:
-            print("send from")
-        case .receiveViewTapped:
-            print("send to")
+        case .sendingFromViewTapped, .receiveViewTapped:
+            print("do nothing")
         }
     }
 }

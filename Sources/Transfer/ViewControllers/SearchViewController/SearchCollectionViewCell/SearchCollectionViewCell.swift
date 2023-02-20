@@ -1,6 +1,6 @@
 //
 //  SearchCollectionViewCell.swift
-//  ArgyleTest
+//  TransferGoTest
 //
 //  Created by Vitalii Kizlov on 11.02.2023.
 //
