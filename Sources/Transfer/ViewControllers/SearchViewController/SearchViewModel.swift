@@ -8,7 +8,7 @@
 import Foundation
 import Combine
 
-public final class SearchViewModel {
+final class SearchViewModel {
 
     // MARK: - Dependencies
 

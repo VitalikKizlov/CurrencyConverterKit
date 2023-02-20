@@ -10,7 +10,7 @@ import Combine
 import CombineCocoa
 import Utilities
 
-public final class SearchViewController: UIViewController {
+final class SearchViewController: UIViewController {
 
     private let viewModel: SearchViewModel
 
@@ -38,7 +38,7 @@ public final class SearchViewController: UIViewController {
 
     // MARK: - Init
 
-    public init(_ viewModel: SearchViewModel) {
+    init(_ viewModel: SearchViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
