@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import Utilities
 
 public final class SwapView: UIView {
 

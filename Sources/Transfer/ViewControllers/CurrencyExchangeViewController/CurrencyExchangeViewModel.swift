@@ -8,8 +8,6 @@
 import Foundation
 import UIKit
 import Combine
-import Injection
-import Networking
 
 public final class CurrencyExchangeViewModel {
 

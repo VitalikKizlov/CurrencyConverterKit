@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import Utilities
 
 final class SearchCollectionViewCell: UICollectionViewCell {
 

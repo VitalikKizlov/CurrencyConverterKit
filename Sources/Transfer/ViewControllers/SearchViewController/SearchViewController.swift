@@ -8,7 +8,6 @@
 import UIKit
 import Combine
 import CombineCocoa
-import Utilities
 
 final class SearchViewController: UIViewController {
 
